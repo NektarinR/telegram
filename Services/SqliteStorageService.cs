@@ -33,19 +33,16 @@ namespace Ether_bot.Services
                 ChangeDate = regTime
             };
             _ethereumBotContext.States.Add(userState);
-            await _ethereumBotContext.SaveChangesAsync();
             CurrencyModel currMdl = new CurrencyModel()
             {
                 Currency = currency
             };
             _ethereumBotContext.Currencies.Add(currMdl);
-            await _ethereumBotContext.SaveChangesAsync();
             ExchangeModel exchMdl = new ExchangeModel()
             {
                 Exchange = exchange
             };
             _ethereumBotContext.Exchanges.Add(exchMdl);
-            await _ethereumBotContext.SaveChangesAsync();
             UserModel user = new UserModel()
             {
                 Id = idUser,
