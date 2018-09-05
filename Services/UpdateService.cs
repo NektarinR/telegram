@@ -15,35 +15,12 @@ namespace Ether_bot.Services
         private readonly IBotService _botService;
         private readonly ILogger _logger;
         private readonly IStorageService _storageService;
-        private readonly Dictionary<States,ReplyKeyboardMarkup> dictKeyboard;
         public UpdateService(IBotService botService, 
             ILogger<UpdateService> logger, IStorageService storageService)
         {
             _botService = botService;
             _logger = logger;
-            _storageService = storageService;
-            dictKeyboard = new Dictionary<States, ReplyKeyboardMarkup>();
-            dictKeyboard.Add(States.Start,new ReplyKeyboardMarkup(new [] 
-            {
-                new KeyboardButton[] { "Текущий курс","Валюта"},
-                new KeyboardButton[] { "Биржа", " Уведомления" }
-            },true));
-            dictKeyboard.Add(States.Currency, new ReplyKeyboardMarkup(new []
-            {
-                new KeyboardButton[]{"USD", "Rub"},
-                new KeyboardButton[]{"Назад"}
-            },true));
-            dictKeyboard.Add(States.Exchange, new ReplyKeyboardMarkup(new []
-            {
-                new KeyboardButton[]{"exmo.me"},
-                new KeyboardButton[]{"Назад"}
-            },true));
-            dictKeyboard.Add(States.TimeNotify, new ReplyKeyboardMarkup(new []
-            {
-                new KeyboardButton[]{"Назад", "15 мин"},
-                new KeyboardButton[]{"30 мин", "60 мин"},
-                new KeyboardButton[]{"Свое время","Не уведомлять"}
-            },true));
+            _storageService = storageService;            
         }
         public async Task SendAnswerAsync(Update update)
         {
@@ -56,7 +33,9 @@ namespace Ether_bot.Services
                         await _storageService.CreateUserAsync(msg.From.Id,
                             msg.From.Username, msg.Date,msg.Chat.Id, $"{States.Start}");                        
                         await SendStartMenuAsync(msg,States.Start);
-                    }else {
+                    }
+                    else 
+                    {
                         await WhatToDoAsync(msg);
                     }
                 break;
@@ -81,12 +60,14 @@ namespace Ether_bot.Services
                 case "Биржа":
                     if (st != States.Start)
                         return;
-                    await SendNewKeyboadAsync(msg, States.Exchange,"Выберите биржу, с которой будет браться курс ethereum");
+                    await SendNewKeyboadAsync(msg, States.Exchange,
+                        "Выберите биржу, с которой будет браться курс ethereum");
                 break;
                 case "Уведомления":
                     if (st != States.Start)
                         return;
-                    await SendNewKeyboadAsync(msg, States.TimeNotify,"Выберите время уведомления или установите свое");
+                    await SendNewKeyboadAsync(msg, States.TimeNotify,
+                        "Выберите время уведомления или установите свое");
                 break;
                 case "Текущий курс":
 
@@ -103,11 +84,10 @@ namespace Ether_bot.Services
         private async Task SendNewKeyboadAsync(Message msg, States state, string txt)
         {
             await _storageService.UpdateUserStateAsync(msg.From.Id, $"{state}",msg.Date,msg.MessageId);
-
             await _botService.TlgBotClient.SendTextMessageAsync(
                 chatId:msg.Chat.Id,
                 text:txt,
-                replyMarkup: dictKeyboard[state]
+                replyMarkup: _botService.GetKeyboardByState(state)
             );
         }
 
@@ -115,10 +95,11 @@ namespace Ether_bot.Services
         {
             var setUsr = await _storageService.GetSettingsUserAsync(msg.From.Id);
             await _botService.TlgBotClient.SendTextMessageAsync(
-            chatId:msg.Chat.Id,
-            text: String.Format("Текущие настройки:\nвалюта - {0}\nбиржа - {1}\nвремя обновления -{2}",
-                setUsr.currency,setUsr.exchange,setUsr.timeUpdate),
-            replyMarkup: dictKeyboard[state]);
+            chatId: msg.Chat.Id,
+                text: String.Format("Текущие настройки:\nвалюта - {0}\nбиржа - {1}\nвремя обновления -{2}",
+                    setUsr.currency,setUsr.exchange,setUsr.timeUpdate),
+                replyMarkup: _botService.GetKeyboardByState(state)
+            );
             await _storageService.UpdateUserStateAsync(msg.From.Id,$"{state}",msg.Date,msg.MessageId);
         }
     }
