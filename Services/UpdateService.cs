@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Ether_bot.Models;
 using Microsoft.Extensions.Logging;
@@ -88,7 +89,7 @@ namespace Ether_bot.Services
                 chatId:msg.Chat.Id,
                 text:txt,
                 replyMarkup: _botService.GetKeyboardByState(state)
-            );
+            );            
         }
 
         private async Task SendStartMenuAsync(Message msg, States state)
