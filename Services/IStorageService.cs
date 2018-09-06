@@ -15,5 +15,7 @@ namespace Ether_bot.Services
         Task UpdateSettingsUserAsync(int idUser, string newCurrency,string newExchange, int timeUpdate);
         Task<StateModel> GetUserStateAsync(int idUser);
         Task UpdateUserStateAsync(int idUser, string newState, DateTime changeTime, int idMessage);
+        Task<RateExchangeModel> GetRateExchangeAsync(int idUser);
+
     }
 }

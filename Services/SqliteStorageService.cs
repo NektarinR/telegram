@@ -60,9 +60,9 @@ namespace Ether_bot.Services
 
         public async Task<StateModel> GetUserStateAsync(int idUser)
         {
-            var stMdl = await _ethereumBotContext.Users.FirstOrDefaultAsync(a => a.Id == idUser);
+            var stMdl = await _ethereumBotContext.States.FirstOrDefaultAsync(a => a.User.Id == idUser);
             if (stMdl != null)
-                return stMdl.State;
+                return stMdl;
             return null;
         }
 
@@ -86,6 +86,16 @@ namespace Ether_bot.Services
             var tm = user.TimeUpdate.HasValue ?user.TimeUpdate.Value.ToString():"отсутствует";
             return (user.Currency.Currency, user.Exchange.Exchange, 
                 user.TimeUpdate.HasValue ? user.TimeUpdate.Value.ToString():"отсутствует");
+        }
+
+        public async Task<RateExchangeModel> GetRateExchangeAsync(int idUser)
+        {
+            var usr = await _ethereumBotContext.Users.FirstOrDefaultAsync(u => u.Id == idUser);
+            var strPair = $"ETH_{usr.Currency.Currency.ToUpper()}";
+            var idPair = await _ethereumBotContext.Pairs.FirstOrDefaultAsync(p => p.Pair == strPair);
+            var pair = await _ethereumBotContext.RateExchanges.FirstOrDefaultAsync(
+                p => p.IdExchangeModel == usr.Exchange.Id && p.IdPairModel == idPair.Id);
+            return pair;
         }
     }
 }

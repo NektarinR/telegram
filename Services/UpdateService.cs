@@ -71,7 +71,9 @@ namespace Ether_bot.Services
                         "Выберите время уведомления или установите свое");
                 break;
                 case "Текущий курс":
-
+                    if (st != States.Start)
+                        return;
+                    await SendCurrentRate(msg);
                 break;
                 case "USD":case "RUB":
 
@@ -81,6 +83,21 @@ namespace Ether_bot.Services
                         await SendStartMenuAsync(msg,States.Start);
                 break;
             }
+        }
+        private async Task SendCurrentRate(Message msg)
+        {
+            var rateExchange = await _storageService.GetRateExchangeAsync(msg.From.Id);
+            if (rateExchange == null)
+                return;
+            if (rateExchange.Time - ВремяЗапроса > 60){
+                await _botService.TlgBotClient.SendTextMessageAsync(
+                    chatId: msg.Chat.Id,
+                    text: $"{rateExchange.Rate}"
+                );
+                return;
+            }
+            await _ExchangeService.GetRate();
+            await _storageService.UpdateRateExchange();
         }
         private async Task SendNewKeyboadAsync(Message msg, States state, string txt)
         {

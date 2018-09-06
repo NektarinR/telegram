@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Ether_bot.Models
 {
     public class PairModel
