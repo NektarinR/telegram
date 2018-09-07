@@ -14,7 +14,6 @@ namespace Ether_bot.Services
     public class ExchangeService : IExchangeService
     {
         private readonly HttpClient _exchangeClient;
-        private ConcurrentDictionary<(string pairKey,string exchangeKey),RatePair> cacheRate;
         private IMemoryCache _cache;
 
         public ExchangeService(IOptions<ExchangeSettings> exchangeSettings, IMemoryCache cache)
@@ -23,7 +22,6 @@ namespace Ether_bot.Services
             _exchangeClient.Timeout = new TimeSpan(0,0,10);
             _exchangeClient.BaseAddress = new Uri(exchangeSettings.Value.ExmoApi);
             _cache = cache;
-            cacheRate = new ConcurrentDictionary<(string pairKey, string exchangeKey), RatePair>(Environment.ProcessorCount*2,30);
         }
         //Если в словари уже есть пара валюты и биржа валюты, то достаем из словаря
         public async Task<decimal?> GetRateAsync(string pair, string exchange)
