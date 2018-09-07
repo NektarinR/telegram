@@ -16,9 +16,11 @@ namespace Ether_bot.Services
         private readonly IBotService _botService;
         private readonly ILogger _logger;
         private readonly IStorageService _storageService;
-        public UpdateService(IBotService botService, 
-            ILogger<UpdateService> logger, IStorageService storageService)
+        private readonly IExchangeService _exchangeService;
+        public UpdateService(IBotService botService, ILogger<UpdateService> logger, 
+            IStorageService storageService, IExchangeService exchangeService)
         {
+            _exchangeService = exchangeService;
             _botService = botService;
             _logger = logger;
             _storageService = storageService;            
@@ -86,18 +88,15 @@ namespace Ether_bot.Services
         }
         private async Task SendCurrentRate(Message msg)
         {
-            var rateExchange = await _storageService.GetRateExchangeAsync(msg.From.Id);
-            if (rateExchange == null)
-                return;
-            if (rateExchange.Time - ВремяЗапроса > 60){
-                await _botService.TlgBotClient.SendTextMessageAsync(
-                    chatId: msg.Chat.Id,
-                    text: $"{rateExchange.Rate}"
-                );
-                return;
-            }
-            await _ExchangeService.GetRate();
-            await _storageService.UpdateRateExchange();
+            var settingsUser = await _storageService.GetSettingsUserAsync(msg.From.Id);
+            var strPair = $"ETH_{settingsUser.currency.ToUpper()}";
+            var rate = await _exchangeService.GetRateAsync(strPair, settingsUser.exchange);
+            await _botService.TlgBotClient.SendTextMessageAsync(
+                chatId: msg.From.Id,
+                text: rate == null
+                    ?"На бирже не ведется учет в такой валюте"
+                    :$"{rate} {settingsUser.currency}"
+            );
         }
         private async Task SendNewKeyboadAsync(Message msg, States state, string txt)
         {

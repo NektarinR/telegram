@@ -22,17 +22,19 @@ namespace Ether_bot
         {
             services.AddMvc();
             services.Configure<BotSettings>(Configuration.GetSection("BotSettings").GetSection("EthereumBot"));
+            services.Configure<ExchangeSettings>(Configuration.GetSection("ExchangeSettings"));
             services.AddSingleton<IBotService, EthereumBotService>();
+            services.AddSingleton<IExchangeService, ExchangeService>();
             services.AddScoped<IUpdateService, UpdateService>();
             services.AddScoped<IStorageService, SqliteStorageService>();
+            services.AddMemoryCache();
             services.AddEntityFrameworkSqlite();
             services.AddDbContext<EthereumBotContext>(options => 
                 options.UseLazyLoadingProxies().UseSqlite(Configuration.GetConnectionString("SqliteConnection"))
             );
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env,
-            IBotService botService)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();

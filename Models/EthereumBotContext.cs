@@ -9,8 +9,6 @@ namespace Ether_bot.Models
         public DbSet<CurrencyModel> Currencies {get;set;}
         public DbSet<ExchangeModel> Exchanges {get;set;}
         public DbSet<StateModel> States {get;set;}
-        public DbSet<PairModel> Pairs {get;set;}
-        public DbSet<RateExchangeModel> RateExchanges {get;set;}
 
         public EthereumBotContext(DbContextOptions<EthereumBotContext> options)
             :base(options)
@@ -29,8 +27,6 @@ namespace Ether_bot.Models
             modelBuilder.Entity<UserModel>()
                 .HasOne(a => a.State)
                 .WithOne(b => b.User);
-            modelBuilder.Entity<RateExchangeModel>()
-                .HasKey(k => new {k.IdExchangeModel, k.IdPairModel});
         }
     }
 }

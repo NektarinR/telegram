@@ -6,8 +6,8 @@ using Ether_bot.Services;
 
 namespace Ether_bot.Controllers
 {
-    [Route("/")]
     [ApiController]
+    [Route("/")]
     public class MessageController : ControllerBase
     {
         IUpdateService _updateservice;

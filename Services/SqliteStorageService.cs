@@ -48,7 +48,7 @@ namespace Ether_bot.Services
                 Id = idUser,
                 IdChat = idChat,
                 Name = name,
-                RegistrationDate = regTime,
+                RegistrationDate = regTime.ToUniversalTime(),
                 CurrencyId = currMdl.Id,
                 ExchangeId = exchMdl.Id,
                 StateModelId = userState.Id,
@@ -71,7 +71,7 @@ namespace Ether_bot.Services
             var state = await _ethereumBotContext.States.FirstOrDefaultAsync(st => st.User.Id == idUser);
             state.State = newState;
             state.IdMessage = idMessage;
-            state.ChangeDate = changeTime;
+            state.ChangeDate = changeTime.ToUniversalTime();
             await _ethereumBotContext.SaveChangesAsync();
         }
 
@@ -83,19 +83,10 @@ namespace Ether_bot.Services
         public async Task<(string currency, string exchange, string timeUpdate)> GetSettingsUserAsync(int idUser)
         {
             var user = await _ethereumBotContext.Users.FirstOrDefaultAsync(p => p.Id == idUser);
-            var tm = user.TimeUpdate.HasValue ?user.TimeUpdate.Value.ToString():"отсутствует";
             return (user.Currency.Currency, user.Exchange.Exchange, 
-                user.TimeUpdate.HasValue ? user.TimeUpdate.Value.ToString():"отсутствует");
-        }
-
-        public async Task<RateExchangeModel> GetRateExchangeAsync(int idUser)
-        {
-            var usr = await _ethereumBotContext.Users.FirstOrDefaultAsync(u => u.Id == idUser);
-            var strPair = $"ETH_{usr.Currency.Currency.ToUpper()}";
-            var idPair = await _ethereumBotContext.Pairs.FirstOrDefaultAsync(p => p.Pair == strPair);
-            var pair = await _ethereumBotContext.RateExchanges.FirstOrDefaultAsync(
-                p => p.IdExchangeModel == usr.Exchange.Id && p.IdPairModel == idPair.Id);
-            return pair;
+                user.TimeUpdate.HasValue 
+                ? user.TimeUpdate.Value.ToString()
+                :"отсутствует");
         }
     }
 }

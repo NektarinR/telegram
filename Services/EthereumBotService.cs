@@ -18,11 +18,10 @@ namespace Ether_bot.Services
         public EthereumBotService(IOptions<BotSettings> botSettings)
         {            
             _botSettings = botSettings.Value;
-            //var proxy = new WebProxy(_botSettings.Host)
-            TlgBotClient = string.IsNullOrEmpty(_botSettings.Host)
+            TlgBotClient = string.IsNullOrEmpty(_botSettings.HostProxy)
                 ? new TelegramBotClient(_botSettings.Token)
                 : new TelegramBotClient(_botSettings.Token, 
-                    new HttpToSocks5Proxy(_botSettings.Host, int.Parse(_botSettings.Port))
+                    new HttpToSocks5Proxy(_botSettings.HostProxy, int.Parse(_botSettings.PortProxy))
                 );
             dictKeyboard = new Dictionary<States, ReplyKeyboardMarkup>();
             dictKeyboard.Add(States.Start,new ReplyKeyboardMarkup(new [] 
@@ -48,9 +47,6 @@ namespace Ether_bot.Services
             },true));
         }
 
-        public ReplyKeyboardMarkup GetKeyboardByState(States state)
-        {
-            return dictKeyboard[state];
-        }
+        public ReplyKeyboardMarkup GetKeyboardByState(States state) => dictKeyboard[state];
     }
 }
