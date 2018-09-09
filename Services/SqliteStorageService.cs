@@ -22,8 +22,8 @@ namespace Ether_bot.Services
             return await _ethereumBotContext.Users.FirstOrDefaultAsync(user => user.Id == idUser) != null;        
         }
 
-        public async Task CreateUserAsync(int idUser, string name, DateTime regTime, long idChat, 
-            string state, string currency = "USD", string exchange = "exmo.me", int? timeUpdate = null)
+        public async Task CreateUserAsync(int idUser, string name, DateTime regTime, 
+            long idChat, string state, int? timeUpdate = null)
         {
             if (await ExistingUserAsync(idUser))
                 return;
@@ -32,26 +32,15 @@ namespace Ether_bot.Services
                 State = state,
                 ChangeDate = regTime
             };
-            _ethereumBotContext.States.Add(userState);
-            CurrencyModel currMdl = new CurrencyModel()
-            {
-                Currency = currency
-            };
-            _ethereumBotContext.Currencies.Add(currMdl);
-            ExchangeModel exchMdl = new ExchangeModel()
-            {
-                Exchange = exchange
-            };
-            _ethereumBotContext.Exchanges.Add(exchMdl);
             UserModel user = new UserModel()
             {
                 Id = idUser,
                 IdChat = idChat,
                 Name = name,
                 RegistrationDate = regTime.ToUniversalTime(),
-                CurrencyId = currMdl.Id,
-                ExchangeId = exchMdl.Id,
-                StateModelId = userState.Id,
+                Currency = (await _ethereumBotContext.Currencies.FirstOrDefaultAsync(c => c.Currency == "USD")),
+                Exchange = (await _ethereumBotContext.Exchanges.FirstOrDefaultAsync(c => c.Exchange == "exmo.me")),
+                State = userState,
                 TimeUpdate = timeUpdate
             };
             _ethereumBotContext.Users.Add(user);
