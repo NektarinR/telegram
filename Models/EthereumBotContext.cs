@@ -13,7 +13,7 @@ namespace Ether_bot.Models
         public EthereumBotContext(DbContextOptions<EthereumBotContext> options)
             :base(options)
         {
-            Database.EnsureCreated();
+            
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

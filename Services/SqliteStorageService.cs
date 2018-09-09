@@ -30,8 +30,22 @@ namespace Ether_bot.Services
             StateModel userState = new StateModel()
             {
                 State = state,
-                ChangeDate = regTime
+                ChangeDate = regTime.ToUniversalTime()
             };
+            _ethereumBotContext.States.Add(userState);
+            await _ethereumBotContext.SaveChangesAsync();
+            if (!_ethereumBotContext.Currencies.Any())
+            {
+                _ethereumBotContext.Currencies.Add(new CurrencyModel()
+                {
+                    Currency = "USD"
+                });
+                _ethereumBotContext.Exchanges.Add(new ExchangeModel()
+                {
+                    Exchange = "exmo.me"
+                });    
+                await _ethereumBotContext.SaveChangesAsync();
+            }
             UserModel user = new UserModel()
             {
                 Id = idUser,

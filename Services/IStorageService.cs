@@ -8,8 +8,7 @@ namespace Ether_bot.Services
     public interface IStorageService
     {
         Task CreateUserAsync(int idUser, string name, DateTime regTime, 
-            long idChat, string state, string currency = "USD", string exchange ="exmo.me", 
-            int? timeUpdate = null);
+            long idChat, string state, int? timeUpdate = null);
         Task<(string currency,string exchange,string timeUpdate)> GetSettingsUserAsync(int idUser);        
         Task UpdateSettingsUserAsync(int idUser, string newCurrency,string newExchange, int timeUpdate);
         Task<StateModel> GetUserStateAsync(int idUser);

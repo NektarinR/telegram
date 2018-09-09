@@ -34,7 +34,7 @@ namespace Ether_bot.Services
                     if (update.Message.Text == "/start")
                     {
                         await _storageService.CreateUserAsync(msg.From.Id,
-                            msg.From.Username, msg.Date,msg.Chat.Id, $"{States.Start}");                        
+                            msg.From.Username, msg.Date, msg.Chat.Id, $"{States.Start}");                        
                         await SendStartMenuAsync(msg,States.Start);
                     }
                     else 
