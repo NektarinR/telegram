@@ -36,7 +36,8 @@ namespace Ether_bot.Services
             },true));
             dictKeyboard.Add(States.Exchange, new ReplyKeyboardMarkup(new []
             {
-                new KeyboardButton[]{"exmo.me"},
+                new KeyboardButton[]{"Exmo"},
+                new KeyboardButton[]{"Binance"},
                 new KeyboardButton[]{"Назад"}
             },true));
             dictKeyboard.Add(States.TimeNotify, new ReplyKeyboardMarkup(new []

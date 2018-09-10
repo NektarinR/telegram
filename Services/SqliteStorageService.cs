@@ -42,7 +42,7 @@ namespace Ether_bot.Services
                 });
                 _ethereumBotContext.Exchanges.Add(new ExchangeModel()
                 {
-                    Exchange = "exmo.me"
+                    Exchange = "Exmo"
                 });    
                 await _ethereumBotContext.SaveChangesAsync();
             }
@@ -53,7 +53,7 @@ namespace Ether_bot.Services
                 Name = name,
                 RegistrationDate = regTime.ToUniversalTime(),
                 Currency = (await _ethereumBotContext.Currencies.FirstOrDefaultAsync(c => c.Currency == "USD")),
-                Exchange = (await _ethereumBotContext.Exchanges.FirstOrDefaultAsync(c => c.Exchange == "exmo.me")),
+                Exchange = (await _ethereumBotContext.Exchanges.FirstOrDefaultAsync(c => c.Exchange == "Exmo")),
                 State = userState,
                 TimeUpdate = timeUpdate
             };
@@ -78,11 +78,6 @@ namespace Ether_bot.Services
             await _ethereumBotContext.SaveChangesAsync();
         }
 
-        public Task UpdateSettingsUserAsync(int idUser, string newCurrency, string newExchange, int timeUpdate)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<(string currency, string exchange, string timeUpdate)> GetSettingsUserAsync(int idUser)
         {
             var user = await _ethereumBotContext.Users.FirstOrDefaultAsync(p => p.Id == idUser);
@@ -90,6 +85,27 @@ namespace Ether_bot.Services
                 user.TimeUpdate.HasValue 
                 ? user.TimeUpdate.Value.ToString()
                 :"отсутствует");
+        }
+
+        public async Task UpdateUserExchangeAsync(int idUser, string newExchange)
+        {
+            var tsk =  _ethereumBotContext.Users.FirstOrDefaultAsync(u => u.Id == idUser);
+            var exchange = await _ethereumBotContext.Exchanges.FirstOrDefaultAsync(e => e.Exchange == newExchange);
+            if (exchange == null)
+                return;
+            var user = await tsk;
+            user.Exchange = exchange;
+            await _ethereumBotContext.SaveChangesAsync();
+        }
+
+        public Task UpdateUserCurrencyAsync(int idUser, string newCurrency)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateUserTimeNotifyAsync(int idUser, string newTime)
+        {
+            throw new NotImplementedException();
         }
     }
 }

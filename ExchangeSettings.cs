@@ -4,6 +4,7 @@ namespace Ether_bot
 {
     public class ExchangeSettings
     {
-        public string ExmoApi {get;set;}
+        public string Exmo {get;set;}
+        public string Binance {get;set;}
     }
 }

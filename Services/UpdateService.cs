@@ -59,38 +59,49 @@ namespace Ether_bot.Services
                     if (st != States.Start)
                         return;
                     await SendNewKeyboadAsync(msg,States.Currency,"Выберите валюту, в которой будет ethereum");
-                break;
+                    break;
                 case "Биржа":
                     if (st != States.Start)
                         return;
                     await SendNewKeyboadAsync(msg, States.Exchange,
                         "Выберите биржу, с которой будет браться курс ethereum");
-                break;
+                    break;
                 case "Уведомления":
                     if (st != States.Start)
                         return;
                     await SendNewKeyboadAsync(msg, States.TimeNotify,
                         "Выберите время уведомления или установите свое");
-                break;
+                    break;
                 case "Текущий курс":
                     if (st != States.Start)
                         return;
                     await SendCurrentRate(msg);
-                break;
+                    break;
                 case "USD":case "RUB":
-
-                break;
+                    if (st != States.Currency)
+                        return;
+                    break;
+                case "Exmo":case "Binance":
+                    if (st != States.Exchange)
+                        return;
+                    string strNewExchange = msg.Text;
+                    await _storageService.UpdateUserExchangeAsync(msg.From.Id, strNewExchange);
+                    await _botService.TlgBotClient.SendTextMessageAsync(
+                        chatId: msg.From.Id,
+                        text: "Биржа изменена"
+                    );
+                    break;
                 case "Назад":
                     if (st==States.Currency || st==States.Exchange ||st==States.TimeNotify)
                         await SendStartMenuAsync(msg,States.Start);
-                break;
+                    break;
             }
         }
         private async Task SendCurrentRate(Message msg)
         {
             var settingsUser = await _storageService.GetSettingsUserAsync(msg.From.Id);
-            var strPair = $"ETH_{settingsUser.currency.ToUpper()}";
-            var rate = await _exchangeService.GetRateAsync(strPair, settingsUser.exchange);
+            //var strPair = $"ETH_{settingsUser.currency.ToUpper()}";
+            var rate = await _exchangeService.GetRateAsync(settingsUser.currency, settingsUser.exchange);
             await _botService.TlgBotClient.SendTextMessageAsync(
                 chatId: msg.From.Id,
                 text: rate == null

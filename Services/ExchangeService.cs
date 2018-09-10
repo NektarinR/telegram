@@ -13,14 +13,15 @@ namespace Ether_bot.Services
 {
     public class ExchangeService : IExchangeService
     {
-        private readonly HttpClient _exchangeClient;
+        private HttpClient _exchangeClient;
         private IMemoryCache _cache;
+        private IOptions<ExchangeSettings> _exchangeSettings;
 
         public ExchangeService(IOptions<ExchangeSettings> exchangeSettings, IMemoryCache cache)
         {
             _exchangeClient = new HttpClient();
             _exchangeClient.Timeout = new TimeSpan(0,0,10);
-            _exchangeClient.BaseAddress = new Uri(exchangeSettings.Value.ExmoApi);
+            _exchangeSettings = exchangeSettings;
             _cache = cache;
         }
         //Если в словари уже есть пара валюты и биржа валюты, то достаем из словаря
@@ -29,13 +30,25 @@ namespace Ether_bot.Services
             decimal result;         
             if (!_cache.TryGetValue((pair,exchange), out result))   
             {
-                var response = await _exchangeClient.GetAsync(@"v1/ticker");
-                var strResult = await response.Content.ReadAsStringAsync();
-                var dictResult = JsonConvert.DeserializeObject<Dictionary<string,Pair>>(strResult);
-                Pair _pair;
-                if (!dictResult.TryGetValue(pair, out _pair))
-                    return null;
-                result = decimal.Parse(_pair.buy_price);
+                string response;
+                switch (exchange)
+                {
+                    case "Exmo":
+                        response = await _exchangeClient.GetStringAsync(_exchangeSettings.Value.Exmo);
+                        //var strResult = await response.Content.ReadAsStringAsync();
+                        var dictResult = JsonConvert.DeserializeObject<Dictionary<string,PairExmo>>(response);
+                        PairExmo _pair;
+                        if (!dictResult.TryGetValue($"ETH_{pair.ToUpper()}", out _pair))
+                            return null;
+                        result = decimal.Parse(_pair.buy_price);
+                    break;
+                    case "Binance":
+                        response = await _exchangeClient.GetStringAsync(_exchangeSettings.Value.Binance);
+                        //var strResult = await response.Content.ReadAsStringAsync();
+                        var binaJson = JsonConvert.DeserializeObject<BinancePair>(response);                        
+                        result = decimal.Parse(binaJson.Price);
+                    break;
+                }                
                 _cache.Set((pair,exchange), result,
                     new MemoryCacheEntryOptions
                     {

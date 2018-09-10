@@ -2,7 +2,7 @@ using System;
 
 namespace Ether_bot.Models
 {
-    public class Pair
+    public class PairExmo
     {
         public string buy_price{get;set;}
         public string sell_price{get;set;}
