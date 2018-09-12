@@ -2,7 +2,7 @@ using System;
 
 namespace Ether_bot
 {
-    public enum States
+    public enum EnumStates
     {
         Start = 0,
         #region Currency

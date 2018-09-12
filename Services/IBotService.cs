@@ -7,6 +7,5 @@ namespace Ether_bot.Services
     public interface IBotService
     {
         TelegramBotClient TlgBotClient{get;}        
-        ReplyKeyboardMarkup GetKeyboardByState(States state);
     }
 }
