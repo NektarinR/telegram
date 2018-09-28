@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Telegram.Bot.Types;
-using Ether_bot.Services;
+using Ether_bot.Interfaces;
 
 namespace Ether_bot.Controllers
 {

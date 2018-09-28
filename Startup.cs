@@ -7,6 +7,8 @@ using Ether_bot.Services;
 using Ether_bot.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Ether_bot.Interfaces;
+using Ether_bot.Context;
 
 namespace Ether_bot
 {

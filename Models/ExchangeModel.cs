@@ -9,7 +9,7 @@ namespace Ether_bot.Models
     {
         public int Id {get;set;}
         public string Exchange {get;set;}
+        public string Pair {get;set;}
         public virtual ICollection<UserModel> Users {get;set;}
-        
     }
 }

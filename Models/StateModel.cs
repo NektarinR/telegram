@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -8,8 +9,7 @@ namespace Ether_bot.Models
     {
         public int Id {get;set;}
         public string State{get;set;}
-        public DateTime ChangeDate{get;set;}
-        public long IdMessage{get;set;}
-        public virtual UserModel User {get;set;}
+        public virtual ICollection<UserModel> Users {get;set;}
+        public virtual ICollection<CommandsModel> Commands {get;set;}
     }
 }

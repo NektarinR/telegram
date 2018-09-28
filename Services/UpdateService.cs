@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Ether_bot.Models;
-using Ether_bot.States;
+using Ether_bot.Interfaces;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -17,6 +17,7 @@ namespace Ether_bot.Services
         private readonly IBotService _botService;
         private readonly IStorageService _storageService;
         private readonly IExchangeService _exchangeService;
+
         public UpdateService(IBotService botService, IStorageService storageService, 
             IExchangeService exchangeService)
         {
@@ -25,22 +26,24 @@ namespace Ether_bot.Services
             _storageService = storageService;            
         }
         public async Task SendAnswerAsync(Update update)
-        {            
-            
-            UserStateService userStateSrv = new UserStateService();
+        {                        
             switch (update.Type)
             {
                 case (UpdateType.Message):
-                    await userStateSrv.InitStartStateAsync();
+                    if (update.Message.Text == "/start")
+                    {
+                        ICommand command = FindCommand.Identify("Init", _storageService, _exchangeService);
+                        await command.ExecuteAsync(_botService, update);
+                    }
                 break;
                 case (UpdateType.CallbackQuery):
-                    await userStateSrv.SetStateAsync(await userStateSrv.GetStateAsync(update.CallbackQuery.From.Id));
-                    if (userStateSrv.IsCanExecute(update.CallbackQuery.Data))
-                        userStateSrv.Execute();
-                    //Приходит некоторая команда. в зависимости от нее мы можешь получить
-                    //Либо перейти в новое состояние, либо исполни команду в этом состоянии
-                    //
-                    // if (состояние == start && команда == GetCurrentRateAsync) Обновить на главной странице курс
+                    var state = await _storageService.GetUserAsync(update.CallbackQuery.From.Id);
+                    var cmd = update.CallbackQuery.Data;
+                    if (await _storageService.CanExecuteAsync(state.State.State, cmd))
+                    {
+                        var command = FindCommand.Identify(cmd, _storageService, _exchangeService);
+                        await command?.ExecuteAsync(_botService, update);
+                    }
                 break;
             }
         }

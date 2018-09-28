@@ -6,13 +6,13 @@ using MihaZupan;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Telegram.Bot.Types.ReplyMarkups;
-
+using Ether_bot.Interfaces;
 namespace Ether_bot.Services
 {
     public class EthereumBotService:IBotService
     {
-        public TelegramBotClient TlgBotClient{get; private set;}
-        private readonly BotSettings _botSettings;        
+        public TelegramBotClient TlgBotClient{get;private set;}
+        private readonly BotSettings _botSettings; 
         
         public EthereumBotService(IOptions<BotSettings> botSettings)
         {            

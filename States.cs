@@ -4,7 +4,9 @@ namespace Ether_bot
 {
     public enum EnumStates
     {
+        #region Start
         Start = 0,
+        #endregion
         #region Currency
         Currency = 1,
         #endregion
