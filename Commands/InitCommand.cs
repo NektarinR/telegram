@@ -11,7 +11,11 @@ namespace Ether_bot.Commands
     public class InitCommand : ICommand
     {
         private readonly IStorageService _storageService;
+
         private readonly IExchangeService _exchangeService;
+        
+        private IKeyboard _keyboard = new CallbackKeyboard();
+
         public InitCommand(IStorageService storageService, IExchangeService exchangeService)
         {
             _storageService = storageService;
@@ -24,32 +28,16 @@ namespace Ether_bot.Commands
             {
                 await _storageService.CreateUserAsync(update.Message.From.Id);                            
             }
+            var tskState = _storageService.GetStateAsync("Start");
             var user = await _storageService.GetUserAsync(update.Message.From.Id);
             var rate = await _exchangeService.GetRateAsync(user.Exchange);
-            var text = await _storageService.GetTextCommand("GetCurrentRate", "Start");
+            var text = await _storageService.GetTextCommand("Update", "Start");
             var resultText = String.Format(text, user.Exchange.Exchange, decimal.Round(rate.Value,2),
                 DateTime.Now.ToUniversalTime());
-            var commnds = await _storageService.GetListCommands("Start");
-            List<InlineKeyboardButton> btn = new List<InlineKeyboardButton>();
-            List<InlineKeyboardButton> lstBtns = new List<InlineKeyboardButton>();
-            int i = 0;
-            foreach (var tmpBtn in commnds)
-            {
-                btn.Add(new InlineKeyboardButton(){
-                    CallbackData = tmpBtn.Command,
-                    Text = tmpBtn.Command
-                });
-                if (btn.Count == 2)
-                {
-                    lstBtns.AddRange(btn);
-                    btn.Clear();
-                }
-            }
-            var keyboard = new InlineKeyboardMarkup(lstBtns);
             await botService.TlgBotClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
                 text: resultText,
-                replyMarkup: keyboard
+                replyMarkup: await _keyboard.GetKeyboardAsync(await tskState, _storageService)
             );
         }
     }

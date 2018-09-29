@@ -58,8 +58,9 @@ namespace Ether_bot.Services
 
         public async Task<string> GetTextCommand(string command, string state)
         {
-            return (await _ethereumBotContext.Commands.FirstOrDefaultAsync(cmd => cmd.Command == command
-                && cmd.State.State == state)).Text.Text;
+            var text = await _ethereumBotContext.Commands.FirstOrDefaultAsync(cmd => cmd.Command == command
+                && cmd.State.State == state);
+            return text == null ? null : text.Text.Text;
         }
 
         public async Task<StateModel> GetStateAsync(string state)

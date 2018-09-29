@@ -11,6 +11,7 @@ namespace Ether_bot.Commands
     {
         private readonly IStorageService _storageService;
         private readonly IExchangeService _exchangeService;
+        private IKeyboard _keyboard = new CallbackKeyboard();
         public StartCommand(IStorageService storageService, IExchangeService exchangeService)
         {
             _storageService = storageService;
@@ -25,23 +26,11 @@ namespace Ether_bot.Commands
             var text = await _storageService.GetTextCommand(update.CallbackQuery.Data, user.State.State);
             var resultText = String.Format(text, user.Exchange.Exchange, decimal.Round(rate.Value,2),
                 DateTime.Now.ToUniversalTime());
-            var commnds = await _storageService.GetListCommands("Start");
-            List<InlineKeyboardButton> btn = new List<InlineKeyboardButton>();
-            List<InlineKeyboardButton> lstBtns = new List<InlineKeyboardButton>();
-            int i = 0;
-            foreach (var tmpBtn in commnds)
-            {
-                lstBtns.Add(new InlineKeyboardButton(){
-                    CallbackData = tmpBtn.Command,
-                    Text = tmpBtn.Command
-                });
-            }
-            var keyboard = new InlineKeyboardMarkup(lstBtns);
             var req = botService.TlgBotClient.EditMessageTextAsync(
                 chatId: update.CallbackQuery.Message.Chat.Id,
                 messageId: update.CallbackQuery.Message.MessageId,
                 text: resultText,
-                replyMarkup: keyboard
+                replyMarkup: await _keyboard.GetKeyboardAsync(await tskGetState, _storageService)
             );
             await req;
             if (req.IsCompletedSuccessfully)

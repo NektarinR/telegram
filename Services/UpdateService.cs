@@ -37,12 +37,13 @@ namespace Ether_bot.Services
                     }
                 break;
                 case (UpdateType.CallbackQuery):
-                    var state = await _storageService.GetUserAsync(update.CallbackQuery.From.Id);
+                    var user = await _storageService.GetUserAsync(update.CallbackQuery.From.Id);
                     var cmd = update.CallbackQuery.Data;
-                    if (await _storageService.CanExecuteAsync(state.State.State, cmd))
+                    if (await _storageService.CanExecuteAsync(user.State.State, cmd))
                     {
                         var command = FindCommand.Identify(cmd, _storageService, _exchangeService);
-                        await command?.ExecuteAsync(_botService, update);
+                        if (command != null)
+                            await command?.ExecuteAsync(_botService, update);
                     }
                 break;
             }
