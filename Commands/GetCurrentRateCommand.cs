@@ -13,6 +13,8 @@ namespace Ether_bot.Commands
         private readonly IStorageService _storageService;
         private readonly IExchangeService _exchangeService;
 
+        private readonly IConvertCurrency _convertCurrency;
+
         private IKeyboard _keyboard = new CallbackKeyboard();
         public GetCurrentRateCommand(IStorageService storageService, IExchangeService exchangeService)
         {
@@ -25,9 +27,11 @@ namespace Ether_bot.Commands
             var user = await _storageService.GetUserAsync(update.CallbackQuery.From.Id);
             var rate = await _exchangeService.GetRateAsync(user.Exchange);
             var text = await _storageService.GetTextCommandAsync(update.CallbackQuery.Data);
-            var resultText = String.Format(text, user.Exchange.Exchange, decimal.Round(rate.Value,2),
+            var money = user.Currency.Currency=="USD" ? 
+                rate.Value : 
+                await _convertCurrency?.ConvertCurrencyAsync(rate.Value, user.Currency);
+            var resultText = String.Format(text, user.Exchange.Exchange, decimal.Round(money,2),
                 DateTime.Now.ToUniversalTime());
-            var commnds = await _storageService.GetListCommandsAsync("Start");
             await botService.TlgBotClient.EditMessageTextAsync(
                 chatId: update.CallbackQuery.Message.Chat.Id,
                 messageId: update.CallbackQuery.Message.MessageId,

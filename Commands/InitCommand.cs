@@ -33,7 +33,7 @@ namespace Ether_bot.Commands
             var rate = await _exchangeService.GetRateAsync(user.Exchange);
             var text = await _storageService.GetTextCommandAsync("UpdateRate");
             var resultText = String.Format(text, user.Exchange.Exchange, decimal.Round(rate.Value,2),
-                DateTime.Now.ToUniversalTime());
+                user.Currency.Currency, DateTime.Now.ToUniversalTime());
             await botService.TlgBotClient.SendTextMessageAsync(
                 chatId: update.Message.Chat.Id,
                 parseMode: ParseMode.Html,

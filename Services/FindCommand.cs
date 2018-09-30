@@ -19,10 +19,12 @@ namespace Ether_bot.Services
                 case "BackToStart":
                     return new StartCommand(storageService, exchService);
                 case "UpdateRate":
-                    return new GetCurrentRateCommand(storageService, exchService);
+                    return new StartCommand(storageService, exchService);
                 case "GoToCurrency":
                     return new CurrencyCommand(storageService);
-                case "USD":case "RUB":
+                case "USD":
+                    return new SetCurrencyCommand(storageService, cmd);
+                case "RUB":
                     return new SetCurrencyCommand(storageService, cmd);
                 case "GoToExchanges":
                     return new ExchangeCommand(storageService);
