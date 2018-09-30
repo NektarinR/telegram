@@ -19,24 +19,17 @@ namespace Ether_bot.Services
         {
             _ethereumBotContext = ethereumBotContext;            
         }
-
-        public async Task<bool> CanExecuteAsync(string state, string cmd)
-        {
-            return await _ethereumBotContext.Commands.FirstOrDefaultAsync(u => u.State.State == state && u.Command == cmd) != null;
-        }
             
         public async Task CreateUserAsync(int idUser)
         {
             var currMdl = await _ethereumBotContext.Currencies.FirstOrDefaultAsync(cur => cur.Currency == "USD");
-            var exch = await _ethereumBotContext.Exchanges.FirstOrDefaultAsync(exh => exh.Exchange == "EXMO");
-            var state =  await _ethereumBotContext.States.FirstOrDefaultAsync(st => st.State == "Start");
+            var exch = await _ethereumBotContext.Exchanges.FirstOrDefaultAsync(exh => exh.Exchange == "Exmo");
             
             var usr = new UserModel()
             {
                 Id = idUser,
                 Currency = currMdl,
-                Exchange = exch,
-                State = state
+                Exchange = exch
             };
             await _ethereumBotContext.Users.AddAsync(usr);
             await _ethereumBotContext.SaveChangesAsync();
@@ -48,28 +41,51 @@ namespace Ether_bot.Services
         public async Task<bool> IsExistUserAsync(int idUser)
             =>  await _ethereumBotContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == idUser) != null;
         
-        public async Task<IEnumerable<CommandsModel>> GetListCommands(string state)
+        public async Task<IEnumerable<CommandsModel>> GetListCommandsAsync(string command)
         {
-            var query = (from cmd in _ethereumBotContext.Commands 
-                        where cmd.State.State == state
-                        select cmd);
-            return await query.ToListAsync();
+            var query = (from cmd in _ethereumBotContext.TreeCommands 
+                        where cmd.ParentCommand.Data == command
+                        select cmd.Command);
+            
+            return query.Any() ? await query.ToListAsync() : null;
         }
 
-        public async Task<string> GetTextCommand(string command, string state)
+        public async Task<string> GetTextCommandAsync(string command)
         {
-            var text = await _ethereumBotContext.Commands.FirstOrDefaultAsync(cmd => cmd.Command == command
-                && cmd.State.State == state);
+            var text = await _ethereumBotContext.Commands.FirstOrDefaultAsync(cmd => cmd.Data == command);
             return text == null ? null : text.Text.Text;
         }
 
-        public async Task<StateModel> GetStateAsync(string state)
-            => await _ethereumBotContext.States.FirstOrDefaultAsync(st => st.State == state);
-
-        public async Task SetNewState(UserModel user, StateModel state)
+        public async Task SetNewCurrencyAsync(UserModel user, CurrencyModel currency)
         {
-            user.State = state;
-            await _ethereumBotContext.SaveChangesAsync();
+            if (user.Currency != currency)
+            {   
+                user.Currency = currency;
+                await _ethereumBotContext.SaveChangesAsync();
+            }
         }
+
+        public async Task SetNewExchangeAsync(UserModel user, ExchangeModel exchange)
+        {
+            if (user.Exchange != exchange)
+            {
+                user.Exchange = exchange;
+                await _ethereumBotContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task<CurrencyModel> GetCurrencyAsync(string currency)
+        {
+            var curency = await _ethereumBotContext.Currencies.FirstOrDefaultAsync(cu => cu.Currency == currency);
+            return curency;
+        }
+
+        public async Task<ExchangeModel> GetExchangeAsync(string exchange)
+        {
+            var excha = await _ethereumBotContext.Exchanges.FirstOrDefaultAsync(exch => exch.Exchange == exchange);
+            return excha;
+        }
+
+
     }
 }

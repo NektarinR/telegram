@@ -32,19 +32,15 @@ namespace Ether_bot.Services
                 case (UpdateType.Message):
                     if (update.Message.Text == "/start")
                     {
-                        ICommand command = FindCommand.Identify("Init", _storageService, _exchangeService);
-                        await command.ExecuteAsync(_botService, update);
+                        ICommand com = FindCommand.Identify("Init", _storageService, _exchangeService);
+                        await com.ExecuteAsync(_botService, update);
                     }
                 break;
                 case (UpdateType.CallbackQuery):
-                    var user = await _storageService.GetUserAsync(update.CallbackQuery.From.Id);
                     var cmd = update.CallbackQuery.Data;
-                    if (await _storageService.CanExecuteAsync(user.State.State, cmd))
-                    {
-                        var command = FindCommand.Identify(cmd, _storageService, _exchangeService);
-                        if (command != null)
-                            await command?.ExecuteAsync(_botService, update);
-                    }
+                    var command = FindCommand.Identify(cmd, _storageService, _exchangeService);
+                    if (command != null)
+                        await command.ExecuteAsync(_botService, update);
                 break;
             }
         }

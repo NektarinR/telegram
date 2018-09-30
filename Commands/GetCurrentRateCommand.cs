@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ether_bot.Interfaces;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Ether_bot.Commands
@@ -11,6 +12,8 @@ namespace Ether_bot.Commands
     {
         private readonly IStorageService _storageService;
         private readonly IExchangeService _exchangeService;
+
+        private IKeyboard _keyboard = new CallbackKeyboard();
         public GetCurrentRateCommand(IStorageService storageService, IExchangeService exchangeService)
         {
             _storageService = storageService;
@@ -21,24 +24,16 @@ namespace Ether_bot.Commands
         {
             var user = await _storageService.GetUserAsync(update.CallbackQuery.From.Id);
             var rate = await _exchangeService.GetRateAsync(user.Exchange);
-            var text = await _storageService.GetTextCommand(update.CallbackQuery.Data, user.State.State);
+            var text = await _storageService.GetTextCommandAsync(update.CallbackQuery.Data);
             var resultText = String.Format(text, user.Exchange.Exchange, decimal.Round(rate.Value,2),
                 DateTime.Now.ToUniversalTime());
-            var commnds = await _storageService.GetListCommands("Start");
-            List<InlineKeyboardButton> lstBtns = new List<InlineKeyboardButton>();
-            foreach (var tmpBtn in commnds)
-            {
-                lstBtns.Add(new InlineKeyboardButton(){
-                    CallbackData = tmpBtn.Command,
-                    Text = tmpBtn.Command
-                });
-            }
-            var keyboard = new InlineKeyboardMarkup(lstBtns);
+            var commnds = await _storageService.GetListCommandsAsync("Start");
             await botService.TlgBotClient.EditMessageTextAsync(
                 chatId: update.CallbackQuery.Message.Chat.Id,
                 messageId: update.CallbackQuery.Message.MessageId,
+                parseMode: ParseMode.Html,
                 text: resultText,
-                replyMarkup: keyboard
+                replyMarkup: await _keyboard.GetKeyboardAsync(update.CallbackQuery.Data, _storageService)
             );
         }
     }

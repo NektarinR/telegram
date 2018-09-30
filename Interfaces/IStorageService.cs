@@ -14,14 +14,18 @@ namespace Ether_bot.Interfaces
 
         Task<UserModel> GetUserAsync(int idUser);
 
-        Task<bool> CanExecuteAsync(string state, string cmd);
+        Task<IEnumerable<CommandsModel>> GetListCommandsAsync(string command);
 
-        Task<IEnumerable<CommandsModel>> GetListCommands(string state);
 
-        Task<StateModel> GetStateAsync(string state);
+        Task<CurrencyModel> GetCurrencyAsync(string currency);
 
-        Task SetNewState (UserModel user, StateModel state);
+        Task<ExchangeModel> GetExchangeAsync(string exchange);
 
-        Task<string> GetTextCommand(string command, string state);
+        
+        Task SetNewCurrencyAsync(UserModel user, CurrencyModel currency);
+
+        Task SetNewExchangeAsync(UserModel user, ExchangeModel exchange);
+
+        Task<string> GetTextCommandAsync(string command);
     }
 }

@@ -9,9 +9,9 @@ namespace Ether_bot.Commands
 {
     public class CallbackKeyboard : IKeyboard
     {
-        public async Task<InlineKeyboardMarkup> GetKeyboardAsync(StateModel state, IStorageService storageService)
+        public async Task<InlineKeyboardMarkup> GetKeyboardAsync(string command, IStorageService storageService)
         {
-            var commnds = await storageService.GetListCommands(state.State);
+            var commnds = await storageService.GetListCommandsAsync(command);
             List<List<InlineKeyboardButton>> lstBtns = new List<List<InlineKeyboardButton>>();
             int i = 0;
             int k = 0;
@@ -23,7 +23,7 @@ namespace Ether_bot.Commands
                     i = 0; k++;
                 }
                 lstBtns[k].Add( new InlineKeyboardButton(){
-                    CallbackData = tmpBtn.Command,
+                    CallbackData = tmpBtn.Data,
                     Text = tmpBtn.Command
                 });
                 i++;

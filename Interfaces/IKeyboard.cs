@@ -7,6 +7,6 @@ namespace Ether_bot.Interfaces
 {
     interface IKeyboard
     {
-        Task<InlineKeyboardMarkup> GetKeyboardAsync(StateModel state, IStorageService storageService);
+        Task<InlineKeyboardMarkup> GetKeyboardAsync(string command, IStorageService storageService);
     }
 }

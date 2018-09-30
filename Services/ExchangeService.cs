@@ -34,7 +34,7 @@ namespace Ether_bot.Services
                 string response;
                 switch (exchange.Exchange)
                 {
-                    case "EXMO":
+                    case "Exmo":
                         response = await _exchangeClient.GetStringAsync(_exchangeSettings.Value.Exmo);
                         //var strResult = await response.Content.ReadAsStringAsync();
                         var dictResult = JsonConvert.DeserializeObject<Dictionary<string,PairExmo>>(response);
@@ -43,8 +43,9 @@ namespace Ether_bot.Services
                             return null;
                         result = decimal.Parse(_pair.buy_price);
                     break;
-                    case "BINANCE":
-                        response = await _exchangeClient.GetStringAsync(_exchangeSettings.Value.Binance);
+                    case "Binance":
+                        response = await _exchangeClient.GetStringAsync(String.Format(_exchangeSettings.Value.Binance,
+                            exchange.Pair));
                         //var strResult = await response.Content.ReadAsStringAsync();
                         var binaJson = JsonConvert.DeserializeObject<BinancePair>(response);                        
                         result = decimal.Parse(binaJson.Price);
